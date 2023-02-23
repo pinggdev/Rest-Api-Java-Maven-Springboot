@@ -1,12 +1,18 @@
 package com.restapi.Controller;
 
+import com.restapi.Models.Absen;
 import com.restapi.Models.User;
+import com.restapi.Repo.AbsenRepo;
 import com.restapi.Repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +23,9 @@ public class ApiController {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private AbsenRepo absenRepo;
 
     @GetMapping(value = "/")
     public String getPage() {
@@ -107,12 +116,24 @@ public class ApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
+        // buat objek absen baru dan tambahkan ke database
+        Absen absen = new Absen();
+        absen.setUser(existingUser);
+
+        // atur waktu absen menjadi waktu di Jakarta
+        ZoneId jakartaZone = ZoneId.of("Asia/Jakarta");
+        LocalDateTime now = LocalDateTime.now(jakartaZone).plusHours(7);
+        absen.setJamAbsen(ZonedDateTime.of(now, jakartaZone));
+
+        absenRepo.save(absen);
+
         // buat response dengan informasi user yang berhasil login
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Login successful");
         response.put("data", existingUser);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
 
 
 }
