@@ -18,6 +18,9 @@ public class User {
     @Column
     private String password;
 
+    @Column
+    private String role = "user"; // menambahkan atribut role dengan nilai default user
+
     public long getId() {
         return id;
     }
@@ -48,6 +51,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
 }
